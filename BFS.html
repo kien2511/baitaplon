@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>BFS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        p {
+            margin-top: 20px;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+    </style>
+    <script>
+        class Queue {
+          constructor() {
+            this.items = [];
+          }
+
+          enqueue(element) {
+            this.items.push(element);
+          }
+
+          dequeue() {
+            if (this.isEmpty()) return null;
+            return this.items.shift();
+          }
+
+          isEmpty() {
+            return this.items.length === 0;
+          }
+        }
+
+        function bfsMinCostPath(graph, start, end, costs) {
+            if (start === end) {
+            return [start];
+            }
+
+            let queue = new Queue();
+            let visited = new Array(graph.length).fill(false);
+            let minCosts = new Array(graph.length).fill(Infinity);
+            let papa = new Array(graph.length).fill(-1);
+
+            visited[start] = true;
+            minCosts[start] = 0;
+            queue.enqueue(start); //cho đỉnh đầu tiên vào Queue
+
+            while (!queue.isEmpty()) {
+                let currentVertex = queue.dequeue(); //lấy 1 đỉnh ra khỏi Q
+
+                for (let neighbor = 0; neighbor < graph.length; neighbor++) {
+                    if (graph[currentVertex][neighbor] === 1 && !visited[neighbor]) {
+                        //tìm đc hàng xóm: kề, chưa thăm
+                        let newCost = minCosts[currentVertex] + costs[currentVertex][neighbor];
+                        if (newCost < minCosts[neighbor]) {
+                            minCosts[neighbor] = newCost;
+                            papa[neighbor] = currentVertex;
+                            visited[neighbor] = true; //thăm nó
+                            queue.enqueue(neighbor); // cho vào Q
+
+                        }
+                    }
+                }
+            }
+
+            if (papa[end] === -1) {
+            return []; // Không có đường đi
+            }
+
+            let path = [];
+            let current = end;
+            while (current !== -1) {
+            path.unshift(current);
+            current = papa[current];
+            }
+
+            return path;
+        }
+
+        function runBFS() {
+            // Sử dụng đồ thị và ma trận chi phí để kiểm tra
+            let graph = [
+                [0, 1, 1, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1],
+                [0, 0, 0, 0]
+            ];
+
+            let costs = [
+                [0, 3, 11, Infinity],
+                [Infinity, 0, 7, Infinity],
+                [Infinity, Infinity, 0, 2],
+                [Infinity, Infinity, Infinity, 0]
+            ];
+
+            let startVertex = 0;
+            let endVertex = 3;
+
+            let minCostPath = bfsMinCostPath(graph, startVertex, endVertex, costs);
+            document.getElementById("result").innerHTML = "Đường đi ngắn nhất: " + minCostPath.join(" -> ");
+        }
+    </script>
+</head>
+<body>
+    <h2>Thuật toán BFS</h2>
+    <button onclick="runBFS()">Chạy thuật toán</button>
+    <p id="result"></p>
+</body>
+</html>
